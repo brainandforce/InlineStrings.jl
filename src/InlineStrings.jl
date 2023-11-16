@@ -86,8 +86,10 @@ const InlineStringTypes = Union{InlineString1,
 
 Base.promote_rule(::Type{S}, ::Type{T}) where {S <: InlineString, T <: InlineString} = 
     argmax(sizeof, (S, T))
-
 Base.promote_rule(::Type{T}, ::Type{String}) where {T <: InlineString} = String
+# Copy SubStrings of InlineStrings into InlineStrings of the wider type
+Base.promote_rule(::Type{S}, ::Type{SubString{T}}) where {S <: InlineString, T <: InlineString} =
+    promote_rule(S, T)
 
 Base.widen(::Type{InlineString1}) = InlineString3
 Base.widen(::Type{InlineString3}) = InlineString7

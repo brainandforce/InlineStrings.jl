@@ -40,6 +40,28 @@ y = InlineString7(x)
 @test promote_type(InlineString31, InlineString127) === InlineString127
 @test promote_type(InlineString255, InlineString7) === InlineString255
 @test promote_type(InlineString63, InlineString15) === InlineString63
+@test promote_type(InlineString31, SubString{InlineString31}) === InlineString31
+@test promote_type(InlineString3, SubString{InlineString127}) === InlineString127
+@test promote_type(InlineString63, SubString{InlineString7}) === InlineString63
+#= No generic promotion rule exists for String and Substring instances in Base:
+https://github.com/JuliaLang/julia/issues/26200
+@test promote_type(InlineString255, SubString{String}) === String
+@test promote_type(SubString{String}, InlineString1) === String
+@test promote_type(String, SubString{InlineString255}) === String
+=#
+
+# Test with actual strings
+@test eltype(promote(inline15"Never", inline31"gonna")) === InlineString31
+@test eltype(promote(inline63"give", inline15"you up,")) === InlineString63
+line = inline127"Never gonna let you down, never gonna run around and desert you"
+@test split(line) isa AbstractVector{SubString{InlineString127}}
+@test eltype(promote(inline31"Never gonna", split(line)[end])) === InlineString127
+@test eltype(promote(inline255"make you cry", split(line)[end])) === InlineString255
+#= No generic promotion rule exists for String and Substring instances in Base:
+https://github.com/JuliaLang/julia/issues/26200
+@test eltype(promote("Never gonna say goodbye", split(line)[end])) === String
+@test eltype(promote(inline255"Never gonna tell a lie", split("and hurt you")[end])) === String
+=#
 
 # Ensure we haven't caused ambiguity with Base.
 # https://discourse.julialang.org/t/having-trouble-implementating-a-tables-jl-row-table-when-using-badukgoweiqitools-dataframe-tbl-no-longer-works/63622/1

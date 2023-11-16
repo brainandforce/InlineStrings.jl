@@ -84,23 +84,8 @@ const InlineStringTypes = Union{InlineString1,
                             InlineString127,
                             InlineString255}
 
-function Base.promote_rule(::Type{T}, ::Type{S}) where {T <: InlineString, S <: InlineString}
-    T === InlineString1 && return S
-    S === InlineString1 && return T
-    T === InlineString3 && return S
-    S === InlineString3 && return T
-    T === InlineString7 && return S
-    S === InlineString7 && return T
-    T === InlineString15 && return S
-    S === InlineString15 && return T
-    T === InlineString31 && return S
-    S === InlineString31 && return T
-    T === InlineString63 && return S
-    S === InlineString63 && return T
-    T === InlineString127 && return S
-    S === InlineString127 && return T
-    return InlineString255
-end
+Base.promote_rule(::Type{S}, ::Type{T}) where {S <: InlineString, T <: InlineString} = 
+    argmax(sizeof, (S, T))
 
 Base.promote_rule(::Type{T}, ::Type{String}) where {T <: InlineString} = String
 
